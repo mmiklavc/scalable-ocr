@@ -2,7 +2,15 @@
 
 Welcome to the project
 
-So much of our data is represented as human readable scans of documents. However, this kind of document-by-document analysis does not scale, so it is becoming evermore common to need to ingest large numbers of PDFs or scanned documents shows up in almost all sectors. Inevitably these scanned documents must be converted to text for analysis. And since dealing with unstructured data is one of the main selling points for a platform like Hadoop, it means that we must convert large volumes of potentially large documents into a textual representation. We will show you how to use open source tooling (Apache NiFi and Tesseract) to scalably convert volumes of PDFs and ingest into a platform that will allow you to analyze this data at scale.
+So much of our data is represented as human readable scans of documents.
+However, this kind of document-by-document analysis does not scale, so
+it is becoming evermore common to need to ingest large numbers of PDFs
+or scanned documents shows up in almost all sectors. Inevitably these
+scanned documents must be converted to text for analysis. And since
+dealing with unstructured data is one of the main selling points for a
+platform like Hadoop, it means that we must convert large volumes of
+potentially large documents into a textual representation. We will show
+you how to use scalable open source tooling (Apache NiFi and Tesseract) to scalably convert volumes of PDFs and ingest into a platform that will allow you to analyze this data at scale.
 
 #### Cutting a release for ocr
 
