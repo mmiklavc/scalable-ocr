@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ocr</groupId>
+    <artifactId>ocr</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>ocr</name>
+
+    <description>
+        So much of our data is represented as human readable scans of documents. However, this kind of document-by-document analysis does not scale, so it is becoming evermore common to need to ingest large numbers of PDFs or scanned documents shows up in almost all sectors. Inevitably these scanned documents must be converted to text for analysis. And since dealing with unstructured data is one of the main selling points for a platform like Hadoop, it means that we must convert large volumes of potentially large documents into a textual representation. We will show you how to use open source tooling (Apache NiFi and Tesseract) to scalably convert volumes of PDFs and ingest into a platform that will allow you to analyze this data at scale.
+    </description>
+
+    <developers>
+        <developer>
+            <name>Casey Stella</name>
+            <email>cestella@gmail.com</email>
+            <organizationUrl>http://www.caseystella.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Michael Miklavcic</name>
+            <email>michael@clevelandflash.com</email>
+            <organizationUrl>http://blog.michaelmiklavcic.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <modules>
+        <module>conversion</module>
+        <module>preprocessing</module>
+        <module>extraction</module>
+        <module>nifi</module>
+    </modules>
+
+    <properties>
+        <!-- platform encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- source code versions -->
+        <java-source.version>1.8</java-source.version>
+        <java-target.version>1.8</java-target.version>
+
+        <!-- scm locations -->
+        <scm-connection.url>file://localhost/path/to/localrepo</scm-connection.url>
+        <scm-developer-connection.url>file://localhost/path/to/localrepo</scm-developer-connection.url>
+
+        <!-- plugin versions -->
+        <maven-shade-plugin.version>2.3</maven-shade-plugin.version>
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>2.17</maven-failsafe-plugin.version>
+        <maven-source-plugin.version>3.0.0</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+
+        <!-- main dependency versions -->
+        <commons-io.version>2.4</commons-io.version>
+        <guava.version>19.0</guava.version>
+        <logback.version>1.1.6</logback.version>
+        <hadoop.version>2.7.2</hadoop.version>
+
+        <!-- test dependency versions -->
+        <!-- junit version 4.12 does not require junit-dep to work with hamcrest matchers. hamcrest-core is now included as a dependency -->
+        <junit.version>4.12</junit.version>
+        <mockito.version>1.10.19</mockito.version>
+        <multiline-string.version>0.1.2</multiline-string.version>
+    </properties>
+
+    <scm>
+        <connection>scm:git:${scm-connection.url}</connection>
+        <developerConnection>scm:git:${scm-developer-connection.url}</developerConnection>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>multiline-release-repo</id>
+            <url>https://raw.github.com/benelog/multiline/master/maven-repository</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <!--    uncomment to include the hadoop client
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-client</artifactId>
+                    <version>${hadoop.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+        -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.adrianwalker</groupId>
+            <artifactId>multiline-string</artifactId>
+            <version>${multiline-string.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${java-source.version}</source>
+                    <target>${java-target.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*AcceptanceTest*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <includes>
+                        <include>**/*AcceptanceTest*.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
