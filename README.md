@@ -1,4 +1,4 @@
-# ocr
+# Scalable OCR
 
 Welcome to the project
 
@@ -11,6 +11,15 @@ dealing with unstructured data is one of the main selling points for a
 platform like Hadoop, it means that we must convert large volumes of
 potentially large documents into a textual representation. We will show
 you how to use scalable open source tooling (Apache NiFi and Tesseract) to scalably convert volumes of PDFs and ingest into a platform that will allow you to analyze this data at scale.
+
+## To Do
+- [ ] Convert multi-page PDFs to multiple TIFF files
+
+## Done
+- [x] find approach for performant text extraction - http://research.microsoft.com/pubs/149305/1509.pdf
+- [x] setup Maven project
+
+# Developers
 
 #### Cutting a release for ocr
 

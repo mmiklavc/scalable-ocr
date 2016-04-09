@@ -11,8 +11,16 @@
 
     <name>ocr</name>
 
+    <url>https://github.com/mmiklavc/scalable-ocr</url>
+
     <description>
-        So much of our data is represented as human readable scans of documents. However, this kind of document-by-document analysis does not scale, so it is becoming evermore common to need to ingest large numbers of PDFs or scanned documents shows up in almost all sectors. Inevitably these scanned documents must be converted to text for analysis. And since dealing with unstructured data is one of the main selling points for a platform like Hadoop, it means that we must convert large volumes of potentially large documents into a textual representation. We will show you how to use open source tooling (Apache NiFi and Tesseract) to scalably convert volumes of PDFs and ingest into a platform that will allow you to analyze this data at scale.
+        So much of our data is represented as human readable scans of documents. However, this kind of
+        document-by-document analysis does not scale, so it is becoming evermore common to need to ingest large numbers
+        of PDFs or scanned documents shows up in almost all sectors. Inevitably these scanned documents must be
+        converted to text for analysis. And since dealing with unstructured data is one of the main selling points for a
+        platform like Hadoop, it means that we must convert large volumes of potentially large documents into a textual
+        representation. We will show you how to use open source tooling (Apache NiFi and Tesseract) to scalably convert
+        volumes of PDFs and ingest into a platform that will allow you to analyze this data at scale.
     </description>
 
     <developers>
@@ -48,7 +56,7 @@
         <scm-connection.url>file://localhost/path/to/localrepo</scm-connection.url>
         <scm-developer-connection.url>file://localhost/path/to/localrepo</scm-developer-connection.url>
 
-        <!-- plugin versions -->
+        <!-- build plugin versions -->
         <maven-shade-plugin.version>2.3</maven-shade-plugin.version>
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
@@ -56,12 +64,17 @@
         <maven-source-plugin.version>3.0.0</maven-source-plugin.version>
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <scala-maven-plugin.version>3.2.1</scala-maven-plugin.version>
+
+        <!-- report plugin versions -->
+        <maven-project-info-reports-plugin>2.9</maven-project-info-reports-plugin>
 
         <!-- main dependency versions -->
         <commons-io.version>2.4</commons-io.version>
         <guava.version>19.0</guava.version>
         <logback.version>1.1.6</logback.version>
         <hadoop.version>2.7.2</hadoop.version>
+        <scala.version>2.11.8</scala.version>
 
         <!-- test dependency versions -->
         <!-- junit version 4.12 does not require junit-dep to work with hamcrest matchers. hamcrest-core is now included as a dependency -->
@@ -84,6 +97,16 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -137,6 +160,17 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>${scala-maven-plugin.version}</version>
+                    <configuration>
+                        <args>
+                            <!-- work-around for https://issues.scala-lang.org/browse/SI-8358 -->
+                            <arg>-nobootcp</arg>
+                        </args>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -206,19 +240,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${maven-release-plugin.version}</version>
                 <configuration>
@@ -227,5 +248,38 @@
             </plugin>
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports-plugin}</version>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <id>default</id>
+                        <reports>
+                            <report>javadoc</report>
+                            <report>test-javadoc</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>
