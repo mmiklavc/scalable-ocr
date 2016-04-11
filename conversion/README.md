@@ -25,3 +25,6 @@ or, including custom jna path
 $ mvn -Djna.library.path=/opt/local/lib/ exec:java -Dexec.mainClass="ocr.conversion.Convert" -Dexec.args="file-location"
 ```
 
+**Reference**
+
+* [Ghost4j](http://www.ghost4j.org/)
