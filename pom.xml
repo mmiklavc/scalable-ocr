@@ -65,6 +65,7 @@
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <scala-maven-plugin.version>3.2.1</scala-maven-plugin.version>
+        <scalatest-maven-plugin.version>1.0</scalatest-maven-plugin.version>
 
         <!-- report plugin versions -->
         <maven-project-info-reports-plugin>2.9</maven-project-info-reports-plugin>
@@ -75,11 +76,13 @@
         <logback.version>1.1.6</logback.version>
         <hadoop.version>2.7.2</hadoop.version>
         <scala.version>2.11.8</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
 
         <!-- test dependency versions -->
         <!-- junit version 4.12 does not require junit-dep to work with hamcrest matchers. hamcrest-core is now included as a dependency -->
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
+        <scalatest.version>2.2.6</scalatest.version>
         <multiline-string.version>0.1.2</multiline-string.version>
     </properties>
 
@@ -104,6 +107,16 @@
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>
                 <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scalactic</groupId>
+                <artifactId>scalactic_${scala.binary.version}</artifactId>
+                <version>${scalatest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.binary.version}</artifactId>
+                <version>${scalatest.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -165,11 +178,55 @@
                     <artifactId>scala-maven-plugin</artifactId>
                     <version>${scala-maven-plugin.version}</version>
                     <configuration>
+                        <recompileMode>incremental</recompileMode>
+                        <useZincServer>true</useZincServer>
+                        <javacArgs>
+                            <javacArg>-Xlint:unchecked</javacArg>
+                            <javacArg>-Xlint:deprecation</javacArg>
+                        </javacArgs>
                         <args>
+                            <arg>-unchecked</arg>
+                            <arg>-deprecation</arg>
+                            <arg>-explaintypes</arg>
                             <!-- work-around for https://issues.scala-lang.org/browse/SI-8358 -->
                             <arg>-nobootcp</arg>
                         </args>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>scala-compile-first</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-test-compile</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest-maven-plugin</artifactId>
+                    <version>${scalatest-maven-plugin.version}</version>
+                    <configuration>
+                        <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                        <junitxml>.</junitxml>
+                        <filereports>WDF TestSuite.txt</filereports>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>test</id>
+                            <goals>
+                                <goal>test</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
