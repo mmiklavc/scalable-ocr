@@ -6,6 +6,8 @@ import com.sun.xml.internal.rngom.ast.builder.BuildException;
 import ocr.preprocessing.conversion.handler.*;
 import org.apache.commons.cli.*;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -157,7 +159,16 @@ public enum CleaningOptions {
 
   public static void printHelp() {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp( "SimpleEnrichmentFlatFileLoader", getOptions());
+    formatter.printHelp( "Preprocessor", getOptions());
+  }
+
+  public static String getUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    formatter.printOptions(pw, 80, getOptions(), 0, 0);
+    pw.flush();
+    return sw.toString();
   }
 
   public static Options getOptions() {
@@ -168,65 +179,4 @@ public enum CleaningOptions {
     return ret;
   }
 
-
-  public static String[] translateCommandLine(String toProcess) {
-    if (toProcess == null || toProcess.length() == 0) {
-      //no command? no string
-      return new String[0];
-    }
-    // parse with a simple finite state machine
-
-    final int normal = 0;
-    final int inQuote = 1;
-    final int inDoubleQuote = 2;
-    int state = normal;
-    final StringTokenizer tok = new StringTokenizer(toProcess, "\"\' ", true);
-    final ArrayList<String> result = new ArrayList<String>();
-    final StringBuilder current = new StringBuilder();
-    boolean lastTokenHasBeenQuoted = false;
-
-    while (tok.hasMoreTokens()) {
-      String nextTok = tok.nextToken();
-      switch (state) {
-        case inQuote:
-          if ("\'".equals(nextTok)) {
-            lastTokenHasBeenQuoted = true;
-            state = normal;
-          } else {
-            current.append(nextTok);
-          }
-          break;
-        case inDoubleQuote:
-          if ("\"".equals(nextTok)) {
-            lastTokenHasBeenQuoted = true;
-            state = normal;
-          } else {
-            current.append(nextTok);
-          }
-          break;
-        default:
-          if ("\'".equals(nextTok)) {
-            state = inQuote;
-          } else if ("\"".equals(nextTok)) {
-            state = inDoubleQuote;
-          } else if (" ".equals(nextTok)) {
-            if (lastTokenHasBeenQuoted || current.length() != 0) {
-              result.add(current.toString());
-              current.setLength(0);
-            }
-          } else {
-            current.append(nextTok);
-          }
-          lastTokenHasBeenQuoted = false;
-          break;
-      }
-    }
-    if (lastTokenHasBeenQuoted || current.length() != 0) {
-      result.add(current.toString());
-    }
-    if (state == inQuote || state == inDoubleQuote) {
-      throw new IllegalStateException("unbalanced quotes in " + toProcess);
-    }
-    return result.toArray(new String[result.size()]);
-  }
 }

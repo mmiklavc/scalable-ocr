@@ -17,15 +17,15 @@ object Driver {
       * @param args
       */
     def main(args: Array[String]): Unit = {
-        sys.exit(run(args))
+        run(args)
     }
 
-    def run(args: Array[String]): Int = {
+    def run(args: Array[String]): List[File] = {
         val config: ConfigOptions = buildConfig(args)
         setupJnaLibPath(config)
         setupOutputLocation(config)
-        val converter = new Converter(config)
-        converter.convert()
+        val converter = new Converter
+        converter.convert(config)
     }
 
     def setupOutputLocation(config: ConfigOptions): Unit = {

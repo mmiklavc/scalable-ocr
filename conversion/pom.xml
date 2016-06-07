@@ -12,15 +12,38 @@
 
     <artifactId>conversion</artifactId>
     <name>conversion</name>
-
+    <repositories>
+        <repository>
+            <!-- Not needed for "*-geoapi-3.0" versions -->
+            <id>geotoolkit</id>
+            <name>Geotk repository</name>
+            <url>http://maven.geotoolkit.org</url>
+        </repository>
+    </repositories>
     <properties>
         <!-- plugin versions -->
 
         <!-- main dependency versions -->
         <ghost4j.version>1.0.1</ghost4j.version>
+        <bouncycastle.version>1.46</bouncycastle.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverageio</artifactId>
+            <version>3.17</version>
+        </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>

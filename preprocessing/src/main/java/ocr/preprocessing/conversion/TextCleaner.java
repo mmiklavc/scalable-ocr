@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.Function;
 
@@ -277,6 +279,20 @@ public class TextCleaner {
     return CLIUtils.translateCommandline(Joiner.on(" ").join(ret));
   }
 
+  public byte[] convert(InputStream is) throws IOException, CommandFailedException {
+    String suffix = ".tiff";
+    File file = getTmpOutputFile(suffix);
+    try {
+      Files.copy(is, file.toPath());
+      return convert(file.getAbsolutePath(), suffix);
+    }
+    finally {
+      if(file != null && file.exists()) {
+        file.delete();
+      }
+    }
+  }
+
   public byte[] convert(String inputFile, String suffix) throws IOException, CommandFailedException {
     File outFile = null;
     try {
@@ -306,7 +322,7 @@ public class TextCleaner {
     } catch (InterruptedException e) {
       throw new CommandFailedException("Unable to complete process!", e);
     } finally {
-      if(outFile != null) {
+      if(outFile != null && outFile.exists()) {
         outFile.delete();
       }
     }

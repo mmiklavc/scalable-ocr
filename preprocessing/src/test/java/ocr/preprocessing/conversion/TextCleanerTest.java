@@ -23,7 +23,7 @@ public class TextCleanerTest {
     String output = "src/test/resources/images/brscan_original_r90-out.jpg";
     String args = "-g -e normalize -f 15 -o 10 -u -s 2 -T -p 20";
     DefaultParser parser = new DefaultParser();
-    CommandLine cli = CleaningOptions.parse(parser, CleaningOptions.translateCommandLine(args) );
+    CommandLine cli = CleaningOptions.parse(parser, CLIUtils.translateCommandline(args) );
     TextCleaner cleaner = CleaningOptions.createTextCleaner(cli, null);
     String commandLine = Joiner.on(" ").join(cleaner.getCommandLine(input, output));
     Assert.assertNotNull(commandLine);
