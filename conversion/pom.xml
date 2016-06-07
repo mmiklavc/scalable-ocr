@@ -30,6 +30,7 @@
             <artifactId>ghost4j</artifactId>
             <version>${ghost4j.version}</version>
         </dependency>
+
     </dependencies>
 
     <build>
