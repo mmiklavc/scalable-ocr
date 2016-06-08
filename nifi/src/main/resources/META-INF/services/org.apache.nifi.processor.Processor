@@ -1,3 +1,3 @@
-ocr.nifi.preprocessing.Processor
-ocr.nifi.conversion.Processor
-ocr.nifi.extraction.Processor
+ocr.nifi.preprocessing.PreprocessingProcessor
+ocr.nifi.conversion.ConversionProcessor
+ocr.nifi.extraction.ExtractionProcessor

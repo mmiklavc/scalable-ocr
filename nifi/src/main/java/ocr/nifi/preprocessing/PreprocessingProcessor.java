@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @SideEffectFree
 @Tags({"ocr preprocessing", "image manipulation"})
 @CapabilityDescription("Preprocess images of text documents to clean them")
-public class Processor extends AbstractProcessor {
-  private static PropertyDescriptor DEFINITIONS = new PropertyDescriptor.Builder()
+public class PreprocessingProcessor extends AbstractProcessor {
+  static PropertyDescriptor DEFINITIONS = new PropertyDescriptor.Builder()
                                                                         .name("definition")
                                                                         .description(CleaningOptions.getUsage())
                                                                         .required(true)
@@ -56,19 +56,19 @@ public class Processor extends AbstractProcessor {
                                                                   }
                                                                                      )
                                                                         .build();
-  private static PropertyDescriptor TEMP_DIR = new PropertyDescriptor.Builder()
+  static PropertyDescriptor TEMP_DIR = new PropertyDescriptor.Builder()
                                                                      .name("temp_space")
                                                                      .description("Temporary directory to be used.")
                                                                      .required(false)
                                                                      .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
                                                                      .build();
-  private static PropertyDescriptor CONVERT_PATH = new PropertyDescriptor.Builder()
+  static PropertyDescriptor CONVERT_PATH = new PropertyDescriptor.Builder()
                                                                      .name("convert_bin_path")
                                                                      .description("The path to the convert (imagemagick) utility")
                                                                      .required(true)
                                                                      .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
                                                                      .build();
-  private static Relationship SUCCESS  = new Relationship.Builder()
+  static Relationship SUCCESS  = new Relationship.Builder()
                                                          .name("SUCCESS")
                                                          .description("Success relationship")
                                                          .build();

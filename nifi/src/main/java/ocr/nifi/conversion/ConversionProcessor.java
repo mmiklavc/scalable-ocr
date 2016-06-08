@@ -29,31 +29,36 @@ import java.util.concurrent.atomic.AtomicReference;
 @SideEffectFree
 @Tags({"ocr preprocessing", "image manipulation"})
 @CapabilityDescription("Preprocess images of text documents extract pages and data")
-public class Processor extends AbstractProcessor {
-  private static PropertyDescriptor JNI_PATH = new PropertyDescriptor.Builder()
-                                                                     .name("jni_path")
-                                                                     .description("JNI Path")
-                                                                     .required(true)
-                                                                     .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
-                                                                     .build();
-  private static PropertyDescriptor TEMP_DIR = new PropertyDescriptor.Builder()
-                                                                     .name("temp_space")
-                                                                     .description("Temporary directory to be used.")
-                                                                     .required(false)
-                                                                     .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
-                                                                     .build();
-  private static Relationship SUCCESS  = new Relationship.Builder()
-                                                         .name("SUCCESS")
-                                                         .description("Success relationship")
-                                                         .build();
+public class ConversionProcessor extends AbstractProcessor {
+  static PropertyDescriptor JNI_PATH = new PropertyDescriptor.Builder()
+                                                             .name("jni_path")
+                                                             .description("JNI Path")
+                                                             .required(true)
+                                                             .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
+                                                             .build();
+  static PropertyDescriptor TEMP_DIR = new PropertyDescriptor.Builder()
+                                                             .name("temp_space")
+                                                             .description("Temporary directory to be used.")
+                                                             .required(false)
+                                                             .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
+                                                             .build();
+  static Relationship SUCCESS  = new Relationship.Builder()
+                                                 .name("SUCCESS")
+                                                 .description("Success relationship")
+                                                 .build();
+  static Relationship RAW = new Relationship.Builder()
+                                            .name("RAW")
+                                            .description("Raw data")
+                                            .build();
   private List<PropertyDescriptor> properties = ImmutableList.of(TEMP_DIR, JNI_PATH);
 
-  private Set<Relationship> relationships = ImmutableSet.of( SUCCESS );
+  private Set<Relationship> relationships = ImmutableSet.of( SUCCESS, RAW );
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
     final ProcessorLog log = this.getLogger();
     final AtomicReference<List<Map.Entry<File, Boolean>>> value = new AtomicReference<>();
     final File tempDir = new File(context.getProperty(TEMP_DIR).getValue());
+    System.getProperties().setProperty("jna.library.path", context.getProperty(JNI_PATH).getValue());
     FlowFile flowfile = session.get();
     session.read(flowfile, in -> {
       try {
@@ -81,8 +86,8 @@ public class Processor extends AbstractProcessor {
           }
         }
       }
-
     }
+    session.transfer(flowfile, RAW);
   }
 
   private int getPageNumber(String fileName) {

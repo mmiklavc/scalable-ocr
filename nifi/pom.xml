@@ -52,6 +52,12 @@
             <artifactId>nifi-processor-utils</artifactId>
             <version>${nifi.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.nifi</groupId>
+            <artifactId>nifi-mock</artifactId>
+            <version>${nifi.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

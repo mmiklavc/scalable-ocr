@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.Function;
@@ -283,7 +284,7 @@ public class TextCleaner {
     String suffix = ".tiff";
     File file = getTmpOutputFile(suffix);
     try {
-      Files.copy(is, file.toPath());
+      Files.copy(is, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
       return convert(file.getAbsolutePath(), suffix);
     }
     finally {

@@ -24,20 +24,20 @@ import java.util.concurrent.atomic.AtomicReference;
 @SideEffectFree
 @Tags({"ocr"})
 @CapabilityDescription("Extracts text from images")
-public class Processor extends AbstractProcessor {
-  private static PropertyDescriptor JNI_PATH = new PropertyDescriptor.Builder()
+public class ExtractionProcessor extends AbstractProcessor {
+  static PropertyDescriptor JNI_PATH = new PropertyDescriptor.Builder()
                                                                      .name("jni_path")
                                                                      .description("JNI Path")
                                                                      .required(true)
                                                                      .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
                                                                      .build();
-  private static PropertyDescriptor TESS_DATA = new PropertyDescriptor.Builder()
+  static PropertyDescriptor TESS_DATA = new PropertyDescriptor.Builder()
                                                                      .name("tess_data_dir")
                                                                      .description("Tesseract data directory")
                                                                      .required(true)
                                                                      .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
                                                                      .build();
-  private static Relationship SUCCESS  = new Relationship.Builder()
+  static Relationship SUCCESS  = new Relationship.Builder()
                                                          .name("SUCCESS")
                                                          .description("Success relationship")
                                                          .build();
@@ -50,6 +50,7 @@ public class Processor extends AbstractProcessor {
     final ProcessorLog log = this.getLogger();
     final AtomicReference<String> value = new AtomicReference<>();
     final File tessDataDir = new File(context.getProperty(TESS_DATA).getValue());
+    System.getProperties().setProperty("jna.library.path", context.getProperty(JNI_PATH).getValue());
     FlowFile flowfile = session.get();
     session.read(flowfile, in -> {
       try {
