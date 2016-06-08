@@ -236,8 +236,6 @@ public class TextCleaner {
                               ) throws IOException
   {
     BufferedImage img = ImageUtils.INSTANCE.readImage(new File(inputFile));
-    int height = ImageUtils.INSTANCE.getHeight(img);
-    int width = ImageUtils.INSTANCE.getWidth(img);
     int aspectRatio = 0;
     {
       double a = ImageUtils.INSTANCE.getAspectRatio(img);
