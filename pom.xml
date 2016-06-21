@@ -41,6 +41,7 @@
         <module>preprocessing</module>
         <module>extraction</module>
         <module>nifi</module>
+        <module>cli</module>
     </modules>
 
     <properties>
