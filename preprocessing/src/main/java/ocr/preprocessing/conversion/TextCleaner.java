@@ -1,20 +1,21 @@
 package ocr.preprocessing.conversion;
 
-import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import org.apache.commons.cli.*;
+import ocr.common.Util;
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.IOUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Optional;
 
 public class TextCleaner {
   public interface Aliased {
@@ -301,7 +302,7 @@ public class TextCleaner {
       }
       ArrayList<String> completeCommand = new ArrayList<>();
       {
-        String command = "/usr/local/bin/convert";
+        String command = Util.Locations.CONVERT.find().toString();
         if (convertPath.isPresent()) {
           command = convertPath.get();
         }

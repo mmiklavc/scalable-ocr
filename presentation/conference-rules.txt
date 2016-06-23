@@ -1,0 +1,49 @@
+PRESENTATION GUIDELINES
+This guide has been designed to help you prepare for your Hadoop Summit presentation. 
+
+PRESENTATION SUBMISSION REQUESTS
+Your presentation must be uploaded to the speaker website for review by June 17, 2016
+Presentations are to be submitted via uploading into the speaker portal using your unique speaker login credential
+Pack presentations and any embedded video in a folder and deliver the entire folder in a compressed fashion
+Label your file with the day you are scheduled to give your talk, time, company and last name
+For example: June28-1:30pm-company-smith.pptx
+Acceptable File Formats Include: PowerPoint for Windows or MAC or Keynote for MAC
+
+GENERAL ADVICE/ REQUESTS
+The success of your presentation will be a direct result of your preparation. A few notes to keep in mind:
+Planning - Structure your presentation, define what the most important messages are and clearly make your point
+Researching - Check that your information is accurate
+Practice - Rehearse the presentation on your own as well as in front of a friendly audience
+Presentations should be created in a 16:9 aspect ratio at a resolution of 1280 x 720
+Provide the smallest videos possible to avoid problems with playback
+Limit presentation size to 20mb or less to ensure quick loading and smooth playback
+Plan on approximately 30 minutes of presentation and 10 minutes of Q&A, for a total session time of (40) minutes
+
+PRESENTATION SLIDES
+
+TITLE SLIDE
+Clearly state your session title as submitted in your abstract
+Add the speaker(s) full name and company name
+
+TEXT SLIDES
+Don't use a long list of first-level bullets
+Try to avoid bullets wrapping to next line
+Keep bullets succinct; They should be readable, not full sentences
+Use standard fonts no smaller than 24 pts.
+If your slide looks full of text, it probably is. Split it into two slides.
+If using non-standard fonts, you will need to provide those to us in advance so we can ensure your text displays properly. We suggest using standard fonts when and where possible.
+
+GRAPHIC SLIDES
+Yes, a picture is worth a 1,000 words
+Font size should be no smaller than 14pt
+Don't bold any text in font size smaller than 16pt
+Ensure colors have strong contrast as projectors' colors are less bright when projected
+If you use lesser known abbreviations or acronyms ensure they are explained
+
+LAPTOP COMPUTER NOTES
+All presentations will be preloaded and run from the show computer at the AV Tech Table in each room. You will not be allowed to run your presentation from your own laptop, thus the request to submit presentations in advance.
+If you wish to run a demo, you must provide your own laptop, which will be connected to projectors from the podium.
+If you will be using a MAC laptop plan on bringing your own dongle to connect to VGA
+
+SUPPORT
+If you have any questions about your presentation or logistics, please contact Jennifer Beucler at Mosaic Event Management: Jbeucler@mosaicevents.com   

@@ -3,7 +3,6 @@ package ocr.nifi.extraction;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ocr.extraction.tesseract.TesseractUtil;
-import org.apache.commons.io.IOUtils;
 import org.apache.nifi.annotation.behavior.SideEffectFree;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -45,24 +44,31 @@ public class ExtractionProcessor extends AbstractProcessor {
 
   private Set<Relationship> relationships = ImmutableSet.of( SUCCESS );
 
-  @Override
-  public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
-    final ProcessorLog log = this.getLogger();
-    final AtomicReference<String> value = new AtomicReference<>();
-    final File tessDataDir = new File(context.getProperty(TESS_DATA).getValue());
-    System.getProperties().setProperty("jna.library.path", context.getProperty(JNI_PATH).getValue());
-    FlowFile flowfile = session.get();
-    session.read(flowfile, in -> {
-      try {
-        value.set(TesseractUtil.INSTANCE.ocr(in, tessDataDir));
-      } catch (Exception e) {
-        log.error("Unable to ocr: " + e.getMessage(), e);
-      }
-    });
-
-    flowfile = session.write(flowfile, out -> out.write(value.get().getBytes()));
-    session.transfer(flowfile, SUCCESS);
-  }
+    @Override
+    public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
+        final ProcessorLog log = this.getLogger();
+        final AtomicReference<String> value = new AtomicReference<>();
+        final File tessDataDir = new File(context.getProperty(TESS_DATA).getValue());
+        System.getProperties().setProperty("jna.library.path", context.getProperty(JNI_PATH).getValue());
+        if (session != null) {
+            FlowFile flowfile = session.get();
+            if (flowfile != null) {
+                session.read(flowfile, in -> {
+                    try {
+                        value.set(TesseractUtil.INSTANCE.ocr(in, tessDataDir));
+                    } catch (Exception e) {
+                        log.error("Unable to ocr: " + e.getMessage(), e);
+                    }
+                });
+            } else {
+                log.info("Flowfile null");
+            }
+            flowfile = session.write(flowfile, out -> out.write(value.get().getBytes()));
+            session.transfer(flowfile, SUCCESS);
+        } else {
+            log.info("Session null");
+        }
+    }
 
   @Override
   public Set<Relationship> getRelationships() {
