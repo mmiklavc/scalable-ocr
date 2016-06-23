@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 
 public class TesseractUtilTest {
   @Test
@@ -16,6 +17,7 @@ public class TesseractUtilTest {
     File txtFile = new File("src/test/resources/pdf-test.txt");
     String text = TesseractUtil.INSTANCE.ocr(Files.readAllBytes(inFile.toPath())
                                             ,new File("/usr/local/Cellar/tesseract/3.04.01_1/share/tessdata/")
+                                            , new HashMap<>()
                                             );
     Assert.assertTrue(text.contains("Congratulations, your computer is equipped with a PDF (Portable Document Format)\nreader!"));
   }

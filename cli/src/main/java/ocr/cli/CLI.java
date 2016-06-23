@@ -71,7 +71,15 @@ public class CLI {
       o.setRequired(false);
       o.setArgName("PATH");
       return o;
-    })
+    }),
+    TESSPROPERTIES("D", code ->
+     OptionBuilder.withArgName( "property=value" )
+              .hasArgs(2)
+              .withValueSeparator()
+              .withDescription( "Tesseract variables" )
+              .create( code )
+
+    )
     ;
     Option option;
     String shortCode;
@@ -92,6 +100,15 @@ public class CLI {
     }
     public String get(CommandLine cli, String def) {
       return has(cli)?cli.getOptionValue(shortCode):def;
+    }
+
+    public Map<String, String> getProperties(CommandLine cli) {
+      Properties p = cli.getOptionProperties(shortCode);
+      Map<String, String> ret = new HashMap<>();
+      for(Map.Entry<Object, Object> kv : p.entrySet()) {
+        ret.put(kv.getKey().toString(), kv.getValue().toString());
+      }
+      return ret;
     }
 
 
@@ -181,6 +198,7 @@ public class CLI {
     List<File> files = null;
     File outDir = new File(OcrOptions.OUTPUT.get(cli, "."));
     Set<String> alreadyProcessed = getAlreadyProcessed(outDir);
+    Map<String, String> tessProperties = OcrOptions.TESSPROPERTIES.getProperties(cli);
     if(OcrOptions.INPUT_FILE.has(cli)) {
         files = filterFilesToProcess(extractFilesFromFile(new File(OcrOptions.INPUT_FILE.get(cli))), alreadyProcessed);
     }
@@ -205,7 +223,7 @@ public class CLI {
         try {
           if (page.getValue()) {
             byte[] converted = cleaner.convert(new BufferedInputStream(new FileInputStream(page.getKey())));
-            String pageText = TesseractUtil.INSTANCE.ocr(converted, tessDataPath);
+            String pageText = TesseractUtil.INSTANCE.ocr(converted, tessDataPath, tessProperties);
             String fileName = f.getName() + "-" + pageNumber + ".txt";
             File outFile = new File(outDir, fileName);
             try (PrintWriter pw = new PrintWriter(outFile)) {
