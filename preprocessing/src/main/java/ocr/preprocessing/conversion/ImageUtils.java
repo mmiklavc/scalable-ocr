@@ -25,6 +25,7 @@ public enum ImageUtils {
   }
 
   public double getAspectRatio(BufferedImage img) {
+
     return (1.0*getHeight(img))/getWidth(img);
   }
 

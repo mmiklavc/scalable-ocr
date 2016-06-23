@@ -42,6 +42,7 @@
         <module>extraction</module>
         <module>nifi</module>
         <module>common</module>
+        <module>cli</module>
     </modules>
 
     <properties>
