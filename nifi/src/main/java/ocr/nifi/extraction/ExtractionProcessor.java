@@ -51,7 +51,7 @@ public class ExtractionProcessor extends AbstractProcessor {
                                                  .name("SUCCESS")
                                                  .description("Success relationship")
                                                  .build();
-  private List<PropertyDescriptor> properties = ImmutableList.of(TESS_DATA, JNI_PATH);
+  private List<PropertyDescriptor> properties = ImmutableList.of(TESS_DATA, JNI_PATH, TESS_PROPERTIES);
 
   private Set<Relationship> relationships = ImmutableSet.of( SUCCESS );
 
