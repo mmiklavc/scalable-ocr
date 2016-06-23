@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ocr.extraction.tesseract.TesseractUtil;
 import ocr.nifi.util.JSONUtils;
+import ocr.nifi.validation.Validation;
 import org.apache.nifi.annotation.behavior.SideEffectFree;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -40,11 +41,12 @@ public class ExtractionProcessor extends AbstractProcessor {
                                                               .required(true)
                                                               .addValidator(StandardValidators.FILE_EXISTS_VALIDATOR)
                                                               .build();
-  static PropertyDescriptor TESS_PROPERTIES= new PropertyDescriptor.Builder()
-                                                                   .name("tess_properties")
-                                                                   .description("Tesseract properties")
-                                                                   .required(false)
-                                                                   .build();
+  static PropertyDescriptor TESS_PROPERTIES = new PropertyDescriptor.Builder()
+                                                              .name("tess_properties")
+                                                              .description("Tesseract properties")
+                                                              .required(false)
+                                                              .addValidator(Validation.Validators.JSON_MAP)
+                                                              .build();
   static Relationship SUCCESS  = new Relationship.Builder()
                                                  .name("SUCCESS")
                                                  .description("Success relationship")
@@ -77,16 +79,23 @@ public class ExtractionProcessor extends AbstractProcessor {
     final File tessDataDir = new File(context.getProperty(TESS_DATA).getValue());
     System.getProperties().setProperty("jna.library.path", context.getProperty(JNI_PATH).getValue());
     FlowFile flowfile = session.get();
-    session.read(flowfile, in -> {
-      try {
-        value.set(TesseractUtil.INSTANCE.ocr(in, tessDataDir, tessProperties));
-      } catch (Exception e) {
-        log.error("Unable to ocr: " + e.getMessage(), e);
-      }
-    });
+    if (null != flowfile) {
+      session.read(flowfile, in -> {
+        try {
+          value.set(TesseractUtil.INSTANCE.ocr(in, tessDataDir, tessProperties));
+        } catch (Exception e) {
+          log.error("Unable to ocr: " + e.getMessage(), e);
+        }
+      });
 
-    flowfile = session.write(flowfile, out -> out.write(value.get().getBytes()));
-    session.transfer(flowfile, SUCCESS);
+      flowfile = session.write(flowfile, out -> {
+        out.write(value.get().getBytes());
+        out.flush();
+      });
+      session.transfer(flowfile, SUCCESS);
+    } else {
+      log.warn("NULL flow file");
+    }
   }
 
   @Override

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ocr.preprocessing.conversion.CLIUtils;
 import ocr.preprocessing.conversion.CleaningOptions;
-import ocr.preprocessing.conversion.CommandFailedException;
 import ocr.preprocessing.conversion.TextCleaner;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -98,7 +97,10 @@ public class PreprocessingProcessor extends AbstractProcessor {
         log.error("Unable to execute command: " + e.getMessage(), e);
       }
     });
-    flowfile = session.write(flowfile, out -> out.write(value.get()));
+    flowfile = session.write(flowfile, out -> {
+      out.write(value.get());
+      out.flush();
+    });
     session.transfer(flowfile, SUCCESS);
   }
 

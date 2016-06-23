@@ -222,7 +222,7 @@ public class TextCleaner {
     this.bgColor = bgColor;
   }
 
-  private File getTmpOutputFile(String suffix) throws IOException {
+  private synchronized File getTmpOutputFile(String suffix) throws IOException {
     String dottedSuffix = suffix.charAt(0) == '.'?suffix:("." + suffix);
     if(tmpPath.isPresent()) {
       return File.createTempFile("textCleaner", dottedSuffix, new File(tmpPath.get()));
@@ -302,10 +302,7 @@ public class TextCleaner {
       }
       ArrayList<String> completeCommand = new ArrayList<>();
       {
-        String command = Util.Locations.CONVERT.find().toString();
-        if (convertPath.isPresent()) {
-          command = convertPath.get();
-        }
+        String command = Util.Locations.CONVERT.find(convertPath).orElseThrow(() -> new IllegalStateException("Bad baby.")).getAbsolutePath();
         completeCommand.add(command);
       }
       for(String s : getCommandLine(inputFile, outFile.getAbsolutePath())) {
@@ -318,7 +315,12 @@ public class TextCleaner {
         String stdout = Joiner.on("\n").join(IOUtils.readLines(p.getInputStream()));
         throw new CommandFailedException("Unable to execute convert.  Stderr is: " +  stderr + "\nStdout is: " + stdout);
       }
-      return Files.readAllBytes(outFile.toPath());
+      byte[] ret = Files.readAllBytes(outFile.toPath());
+      if(ret.length == 0) {
+        File iFile = new File(inputFile);
+        throw new IllegalStateException("Wrote out a zero-byte file. Input file was " + iFile.getAbsolutePath() + " (" + Files.readAllBytes(iFile.toPath()) + ")");
+      }
+      return ret;
     } catch (InterruptedException e) {
       throw new CommandFailedException("Unable to complete process!", e);
     } finally {

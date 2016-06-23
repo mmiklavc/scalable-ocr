@@ -20,8 +20,8 @@ public class ExtractionProcessorTest {
         TestRunner runner = TestRunners.newTestRunner(new ExtractionProcessor());
         File inputFile = new File("../extraction/src/test/resources/pdf-test.tiff");
         // Add properties
-        runner.setProperty(ExtractionProcessor.JNI_PATH, Util.Locations.JNA.find().toString());
-        runner.setProperty(ExtractionProcessor.TESS_DATA, Util.Locations.TESSDATA.find().toString());
+        runner.setProperty(ExtractionProcessor.JNI_PATH, Util.Locations.JNA.find().get().getAbsolutePath());
+        runner.setProperty(ExtractionProcessor.TESS_DATA, Util.Locations.TESSDATA.find().get().getAbsolutePath());
         // Add the content to the runner
         runner.enqueue(new FileInputStream(inputFile));
 
