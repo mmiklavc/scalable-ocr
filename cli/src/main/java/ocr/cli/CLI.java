@@ -25,6 +25,12 @@ public class CLI {
       return o;
     }),
     INPUT("i", code -> {
+      Option o = new Option(code, "input", true, "Single Input File");
+      o.setRequired(false);
+      o.setArgName("INPUT");
+      return o;
+    }),
+    INPUT_DIR("id", code -> {
       Option o = new Option(code, "input", true, "Input Directory");
       o.setRequired(false);
       o.setArgName("DIR");
@@ -79,8 +85,13 @@ public class CLI {
               .withDescription( "Tesseract variables" )
               .create( code )
 
-    )
-    ;
+    ),
+    PHASE("ph", code -> {
+      Option o = new Option(code, "phases", true, "Which phases to run: [convert|preprocess|ocr]");
+      o.setRequired(false);
+      o.setArgName("PHASE");
+      return o;
+    });
     Option option;
     String shortCode;
     OcrOptions(String shortCode
@@ -192,6 +203,10 @@ public class CLI {
   public static void main(String... argv) throws ParseException, IOException, CommandFailedException, TesseractException {
     PosixParser parser = new PosixParser();
     CommandLine cli = OcrOptions.parse(parser, argv);
+    String phase = "all";
+    if(OcrOptions.PHASE.has(cli)) {
+      phase = OcrOptions.PHASE.get(cli);
+    }
     System.getProperties().setProperty("jna.library.path", OcrOptions.LIB_PATH.get(cli, "/opt/local/lib"));
     String preprocessingDef = OcrOptions.PREPROCESSING.get(cli);
     String tempDirStr = OcrOptions.TEMP_DIR.get(cli, "/tmp");
@@ -199,14 +214,14 @@ public class CLI {
     File outDir = new File(OcrOptions.OUTPUT.get(cli, "."));
     Set<String> alreadyProcessed = getAlreadyProcessed(outDir);
     Map<String, String> tessProperties = OcrOptions.TESSPROPERTIES.getProperties(cli);
-    if(OcrOptions.INPUT_FILE.has(cli)) {
-        files = filterFilesToProcess(extractFilesFromFile(new File(OcrOptions.INPUT_FILE.get(cli))), alreadyProcessed);
-    }
-    else if(OcrOptions.INPUT.has(cli)){
-      files = filterFilesToProcess(extractFilesFromDirectory(new File(OcrOptions.INPUT.get(cli))), alreadyProcessed);
-    }
-    else {
-      throw new IllegalStateException("Must specify either input file or input");
+    if(OcrOptions.INPUT.has(cli)) {
+      files = Arrays.asList(new File(OcrOptions.INPUT.get(cli)));
+    } else if(OcrOptions.INPUT_FILE.has(cli)) {
+      files = filterFilesToProcess(extractFilesFromFile(new File(OcrOptions.INPUT_FILE.get(cli))), alreadyProcessed);
+    } else if(OcrOptions.INPUT_DIR.has(cli)){
+      files = filterFilesToProcess(extractFilesFromDirectory(new File(OcrOptions.INPUT_DIR.get(cli))), alreadyProcessed);
+    } else {
+      throw new IllegalStateException("Must specify one of input, input directory or input file");
     }
     File tempDir = new File(tempDirStr);
     String convertPath = OcrOptions.CONVERT_PATH.get(cli, "/usr/local/bin/convert");
@@ -217,26 +232,60 @@ public class CLI {
     for(File f : files) {
       System.out.println("Processing " + f.getName() + " (" + i++ + " / " + files.size()+ ")");
       int pageNumber = 0;
-      for(Map.Entry<File, Boolean> page : toPages(new BufferedInputStream(new FileInputStream(f)), tempDir)) {
-        pageNumber++;
-        System.out.println("Page " + pageNumber);
-        try {
-          if (page.getValue()) {
-            byte[] converted = cleaner.convert(new BufferedInputStream(new FileInputStream(page.getKey())));
-            String pageText = TesseractUtil.INSTANCE.ocr(converted, tessDataPath, tessProperties);
-            String fileName = f.getName() + "-" + pageNumber + ".txt";
-            File outFile = new File(outDir, fileName);
-            try (PrintWriter pw = new PrintWriter(outFile)) {
-              IOUtils.write(pageText, pw);
-              pw.flush();
+      if("all".equals(phase)) {
+        for (Map.Entry<File, Boolean> page : toPages(new BufferedInputStream(new FileInputStream(f)), tempDir)) {
+          pageNumber++;
+          System.out.println("Page " + pageNumber);
+          try {
+            if (page.getValue()) {
+              byte[] converted = cleaner.convert(new BufferedInputStream(new FileInputStream(page.getKey())));
+              writePreprocessed(converted, new File(outDir, f.getName() + "-" + pageNumber + ".tiff"));
+              String pageText = TesseractUtil.INSTANCE.ocr(converted, tessDataPath, tessProperties);
+              String fileName = f.getName() + "-" + pageNumber + ".txt";
+              File outFile = new File(outDir, fileName);
+              try (PrintWriter pw = new PrintWriter(outFile)) {
+                IOUtils.write(pageText, pw);
+                pw.flush();
+              }
             }
+          } finally {
+            page.getKey().delete();
           }
         }
-        finally {
-          page.getKey().delete();
+      } else {
+        switch(phase) {
+          case "convert" :
+            toPages(new BufferedInputStream(new FileInputStream(f)), outDir);
+            return;
+          case "preprocess" :
+            byte[] converted = cleaner.convert(new BufferedInputStream(new FileInputStream(f)));
+            writePreprocessed(converted, new File(outDir, f.getName() + "-" + pageNumber + ".tiff"));
+            return;
+          case "ocr" :
+            try (FileInputStream fis = new FileInputStream(f)) {
+              byte[] inFile = IOUtils.toByteArray(fis);
+              String pageText = TesseractUtil.INSTANCE.ocr(inFile, tessDataPath, tessProperties);
+              String fileName = f.getName() + "-" + pageNumber + ".txt";
+              File outFile = new File(outDir, fileName);
+              try (PrintWriter pw = new PrintWriter(outFile)) {
+                IOUtils.write(pageText, pw);
+                pw.flush();
+              }
+            }
+            return;
+          default :
+            throw new IllegalArgumentException("Unknown phase: " + phase);
         }
       }
+    }
+  }
 
+  private static void writePreprocessed(byte[] converted, File file) {
+    try(FileOutputStream fos = new FileOutputStream(file)) {
+      IOUtils.write(converted, fos);
+      fos.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
