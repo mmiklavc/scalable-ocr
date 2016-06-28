@@ -12,12 +12,16 @@ platform like Hadoop, it means that we must convert large volumes of
 potentially large documents into a textual representation. We will show
 you how to use scalable open source tooling (Apache NiFi and Tesseract) to scalably convert volumes of PDFs and ingest into a platform that will allow you to analyze this data at scale.
 
-## To Do
-- [ ] Convert multi-page PDFs to multiple TIFF files
+# Modules
 
-## Done
-- [x] find approach for performant text extraction - http://research.microsoft.com/pubs/149305/1509.pdf
-- [x] setup Maven project
+### Core Modules
+- conversion - convert multi-page PDFs to single-page TIFF files
+- preprocessing - image correction for better text extraction during OCR
+- extraction - OCR images and output text
+
+### Utility
+- CLI - command line tool for manual pipeline process execution
+- NiFi - custom processors for exposing the core modules via NiFi. Workflow template.
 
 # Developers
 
